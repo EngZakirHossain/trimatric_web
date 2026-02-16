@@ -24,7 +24,7 @@
                     creative professionals bringing ideas and creativity together.
                 </p>
                 <div class="horizonral-subtitle">
-                    <span>Unity</span>
+                    <span>Teams</span>
                 </div>
                 <a href="#sec1" class="custom-scroll-link hero-start-link">
                     <span>Let's Start</span>
@@ -92,9 +92,9 @@
         <div class="container">
 
             <div class="post fl-wrap fw-post text-center">
-                <h2><span>OUR STAFF</span></h2>
+                <h2><span>OUR WORKSPACE</span></h2>
                 <div class="blog-media fl-wrap nomar-bottom">
-                    <img src="{{ asset('assets/images/team.png') }}" alt="">
+                    <img src="{{ asset('assets/images/Office.png') }}" alt="">
                 </div>
             </div>
 
