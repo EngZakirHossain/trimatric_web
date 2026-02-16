@@ -29,7 +29,7 @@
                         <!-- gallery-item-->
                         <div class="gallery-item ">
                             <div class="grid-item-holder">
-                                <img height="50%" width="50%" src="{{ $client['logo'] }}" data-toggle="popover" title="{{$client['name']}}" data-content="Default popover">
+                                <img src="{{ $client['logo'] }}" data-toggle="popover" title="{{$client['name']}}" style="height: 150px; width:150px">
                             </div>
                         </div>
                         <!-- gallery-item end-->
