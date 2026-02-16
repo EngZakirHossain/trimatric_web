@@ -45,7 +45,7 @@
                 <li><a href="{{route('projects.list')}}" class="external" target="">Project</a></li>
                 <li><a href="{{route('portfolio')}}" class="external" target="">portfolio</a></li>
                 <li><a href="{{route('team.list')}}" class="external" target="">Team</a></li>
-                <li><a href="#" class="external" target="">Career</a></li>
+                <li><a href="{{route('circular.list')}}" class="external" target="">Career</a></li>
                 <li><a href="{{route('clients.list')}}" class="external" target="">Clients</a></li>
                 <li><a href="{{route('contact')}}" class="external" target="">Contact Us</a></li>
             </ul>

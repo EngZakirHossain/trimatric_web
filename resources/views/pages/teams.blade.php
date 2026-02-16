@@ -43,8 +43,8 @@
                     <div class="flex flex-col items-center justify-center">
                         <div class="team-photo">
                             <div class="overlay"></div>
-                            <img src="{{ $ceo['image'] ?? asset('assets/images/placeholder.jpg') }}" width="370" height="370"
-                                alt="{{ $ceo['name'] }}" class="image-cover">
+                            <img src="{{ $ceo['image'] ?? asset('assets/images/placeholder.jpg') }}" width="400" height="400"
+                                alt="{{ $ceo['name'] }}" class="image-cover team-photo">
                         </div>
                         <div class="team-info mt-3">
                             <h3>{{ $ceo['name'] }}</h3>

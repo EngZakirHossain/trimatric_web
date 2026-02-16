@@ -16,6 +16,7 @@ class SiteSettingService
     {
         return Cache::remember('site_settings', 60000, function () {
             $response = $this->apiGet('site-setting');
+
             return $response['data'] ?? [];
         });
     }

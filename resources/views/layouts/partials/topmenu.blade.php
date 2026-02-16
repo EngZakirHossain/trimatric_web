@@ -1,6 +1,8 @@
 <div class="scroll-nav-wrap fl-wrap">
     <div class="scroll-down-wrap">
-        <img class="img-responsive" width="200px" height="50px" src="{{ $siteSetting['logo'] ?? '' }}" alt="">
+        <a href="{{route('home')}}">
+            <img class="img-responsive" width="180px" height="50px" src="{{ $siteSetting['logo'] ?? '' }}" alt="">
+        </a>
     </div>
     <nav class="scroll-nav scroll-init">
         <ul>

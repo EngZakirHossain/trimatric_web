@@ -38,6 +38,9 @@
         <link type="text/css" rel="stylesheet" href="{{asset('assets')}}/css/style.css">
         <link type="text/css" rel="stylesheet" href="{{asset('assets')}}/css/color.css">
         <link type="text/css" rel="stylesheet" href="{{asset('assets')}}/css/jquery.fancybox.min.css">
+        <!-- In <head> -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+
 
         @yield('style')
         <!--=============== favicons ===============-->
@@ -103,6 +106,20 @@
         <script type="text/javascript" src="{{asset('assets')}}/js/plugins.js"></script>
         <script type="text/javascript" src="{{asset('assets')}}/js/scripts.js"></script>
         <script type="text/javascript" src="{{asset('assets')}}/js/jquery.fancybox.min.js"></script>
+
+        <!-- Before closing </body> -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+        <script>
+            $(document).ready(function() {
+                @if(session('message'))
+                    toastr.success("{{ session('message') }}");
+                @endif
+
+                @if(session('error'))
+                    toastr.error("{{ session('error') }}");
+                @endif
+            });
+        </script>
         @yield('script')
 
     </body>

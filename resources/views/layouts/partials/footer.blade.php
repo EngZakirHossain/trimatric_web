@@ -40,16 +40,16 @@
                     <div class="footer-box fl-wrap">
                         <!-- footer-socilal -->
                         <ul class="scroll-init footer-links">
-                            <li><a className="btn float-btn trsp-btn" href="{{route('home')}}">Home</a></li>
-                            <li><a className="btn float-btn trsp-btn" href="{{route('home')}}#sec2">About</a></li>
-                            <li><a className="btn float-btn trsp-btn" href="{{route('home')}}#sec3">Services</a></li>
-                            <li><a className="btn float-btn trsp-btn" href="#">Projects</a></li>
-                            <li><a className="btn float-btn trsp-btn" href="#">Clients</a></li>
+                            <li><a class="btn float-btn trsp-btn" href="{{route('home')}}">Home</a></li>
+                            <li><a class="btn float-btn trsp-btn" href="{{route('home')}}#sec2">About</a></li>
+                            <li><a class="btn float-btn trsp-btn" href="{{route('home')}}#sec3">Services</a></li>
+                            <li><a class="btn float-btn trsp-btn" href="{{route('projects.list')}}">Projects</a></li>
+                            <li><a class="btn float-btn trsp-btn" href="{{route('clients.list')}}">Clients</a></li>
                         </ul>
                         <!-- footer-socilal end -->
                         <!-- footer-socilal -->
                         <div class="footer-socilal fl-wrap">
-                            <ul >
+                            <ul>
                                 <li><a href="{{ $siteSetting['fb_link'] ?? '' }}" target="_blank"><i class="fab fa-facebook-f"></i></a></li>
                                 <li><a href="{{ $siteSetting['linkedin_link'] ?? '' }}" target="_blank"><i class="fab fa-linkedin"></i></a></li>
                                 <li><a href="{{ $siteSetting['x_link'] ?? '' }}" target="_blank"><i class="fab fa-twitter"></i></a></li>

@@ -40,5 +40,4 @@ return [
         'token' => env('BACKEND_API_TOKEN'),
     ],
 
-
 ];

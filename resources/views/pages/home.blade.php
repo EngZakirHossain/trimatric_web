@@ -107,7 +107,7 @@
                 @php
                     $facts = [
                         ['number' => 15, 'label' => 'Years of Experience'],
-                        ['number' => 200, 'label' => 'Team Members'],
+                        ['number' => 300, 'label' => 'Team Members'],
                         ['number' => 450, 'label' => 'Satisfied Clients'],
                         ['number' => 1000, 'label' => 'Projects'],
                     ];

@@ -22,7 +22,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         View::composer('*', function ($view) {
-            $siteSettingService = new SiteSettingService();
+            $siteSettingService = new SiteSettingService;
             $siteSetting = $siteSettingService->getSiteSetting();
             $view->with('siteSetting', $siteSetting);
         });

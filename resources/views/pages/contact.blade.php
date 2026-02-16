@@ -71,20 +71,14 @@
                 <!-- contact details end  -->
                 <div class="fw-map-container fl-wrap mar-bottom">
                     <div class="map-container">
-{{--                         <div id="singleMap" data-latitude="23.7470099" data-longitude="90.4060213" data-mapTitle="Out Location"></div>--}}
                          <div>
-                        <iframe id="singleMap"  data-mapTitle="Out Location" src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3652.0103620939212!2d90.40672941854262!3d23.747009894821797!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3755b88931a8211d%3A0x494f9016bdd180c9!2sTrimatric%20Architects%20%26%20Engineers!5e0!3m2!1sen!2sbd!4v1622715021313!5m2!1sen!2sbd"  style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+                            <iframe id="singleMap"  data-mapTitle="Out Location" src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3652.0103620939212!2d90.40672941854262!3d23.747009894821797!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3755b88931a8211d%3A0x494f9016bdd180c9!2sTrimatric%20Architects%20%26%20Engineers!5e0!3m2!1sen!2sbd!4v1622715021313!5m2!1sen!2sbd"  style="border:0;" allowfullscreen="" loading="lazy"></iframe>
                          </div>
                     </div>
                 </div>
                 <!--  map end  -->
                 <div class="fl-wrap mar-top">
                     <div class="row">
-                        @if (Session::has('message'))
-                            <div class="alert alert-success">
-                                {{ Session::get('message') }}
-                            </div>
-                        @endif
                         <div class="col-md-3">
                             <div class="pr-title fl-wrap">
                                 <h3>Get In Touch</h3>
@@ -93,8 +87,9 @@
                         <div class="col-md-7">
                             <div id="contact-form">
                                 <div id="message"></div>
-                                <form  class="custom-form" action="#" method="post">
+                                <form  class="custom-form" action="{{ route('contact.submit') }}" method="post">
                                     @csrf
+                                    <input type="text" name="website" style="display:none" autocomplete="off">
                                     <fieldset>
                                         <div class="row">
                                             <div class="col-md-6">
