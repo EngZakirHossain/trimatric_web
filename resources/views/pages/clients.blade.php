@@ -2,7 +2,6 @@
 @section('title', 'Clients')
 @section('content')
     <!-- Content-->
-    <div class="content">
         @include('layouts.partials.breadcrumb')
         <!-- section-->
         <section class="parallax-section dark-bg sec-half parallax-sec-half-right" data-scrollax-parent="true">
@@ -21,7 +20,7 @@
         <!-- section end-->
         <!-- section -->
         <section data-scrollax-parent="true" id="sec1">
-            <div class="section-subtitle"  data-scrollax="properties: { translateY: '150px' }" >Clients<span>//</span></div>
+            <div class="section-subtitle"  data-scrollax="properties: { translateY: '150px' }" ><span>//</span>Clients</div>
             <div class="container">
                 <!-- portfolio start -->
                 <div class="gallery-items spad four-column">
@@ -40,7 +39,6 @@
             <div class="sec-lines"></div>
         </section>
         <!-- section-->
-    </div>
     <!-- Content end -->
 @endsection
 
