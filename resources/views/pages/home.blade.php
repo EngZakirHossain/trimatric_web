@@ -220,6 +220,7 @@
                             <div class="fet_pr-carousel-box-text fl-wrap">
                                 <h3>
                                     <a href="{{route('project.details',$project['slug'])}}">{{$project['title']}}</a>
+                                    <p> {{ $project['category_name'] ?? '--' }}</p>
                                 </h3>
                             </div>
                         </div>
