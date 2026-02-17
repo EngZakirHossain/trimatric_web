@@ -6,7 +6,7 @@
         <div class="single-page-decor"></div>
         @include('layouts.partials.breadcrumb')
         <!-- section  -->
-        <section class="no-padding dark-bg sinsec-dec">
+        <section class="dark-bg sinsec-dec">
             <div class="single-project-title fl-wrap">
                 <h2><span class="caption">{{$project['title']}}</span></h2>
             </div>
