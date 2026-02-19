@@ -18,8 +18,9 @@
         <meta property="og:title" content="Trimatric Architects & Engineers">
         <meta property="og:description" content="One of the pioneer concerns in the field of Interior Design & Turnkey based execution service provider for Residential, Commercial, Hospitality, Retail & Corporate Clients. With the proven capability of excellent imaginative ability and committed professionalism, we bring out the hidden persona of our clients’ and reflect it through Designs tailored accordingly. Apart from business opportunities, we are always keenly devoted to providing innovative, unique and outstanding perspectives for the fulfilment of the requirements which satisfies our clients.">
         <meta property="og:image" content="{{ asset('assets/images/favicon.ico') }}">
-        <meta property=og:image:type" content="image/png"/>
-        <meta property=og:image:height" content="50px"/>
+        <meta property="og:image:type" content="image/png"/>
+        <meta property="og:image:height" content="50"/>
+        <meta property="og:image:width" content="50"/>
 
         <!-- Twitter -->
         <meta property="twitter:card" content="summary_large_image">
@@ -27,8 +28,17 @@
         <meta property="twitter:title" content="Trimatric Architects & Engineers">
         <meta property="twitter:description" content="One of the pioneer concerns in the field of Interior Design & Turnkey based execution service provider for Residential, Commercial, Hospitality, Retail & Corporate Clients. With the proven capability of excellent imaginative ability and committed professionalism, we bring out the hidden persona of our clients’ and reflect it through Designs tailored accordingly. Apart from business opportunities, we are always keenly devoted to providing innovative, unique and outstanding perspectives for the fulfilment of the requirements which satisfies our clients.">
         <meta property="twitter:image" content="{{ asset('assets/images/favicon.ico') }}">
+        <meta property="og:image:type" content="image/png"/>
+        <meta property="og:image:height" content="50"/>
+        <meta property="og:image:width" content="50"/>
         <!-- ============== title =============== -->
-        <title>@yield('title') | {{ $siteSetting['name'] ?? '' }}</title>
+        <title>
+        @hasSection('title')
+            @yield('title') | Trimatric Architects & Engineers
+        @else
+            Trimatric Architects & Engineers | Architecture & Engineering Firm in Bangladesh
+        @endif
+        </title>
         <meta name="title" content="Trimatric Architects & Engineers">
         <meta name="description" content="One of the pioneer concerns in the field of Interior Design & Turnkey based execution service provider for Residential, Commercial, Hospitality, Retail & Corporate Clients. With the proven capability of excellent imaginative ability and committed professionalism, we bring out the hidden persona of our clients’ and reflect it through Designs tailored accordingly. Apart from business opportunities, we are always keenly devoted to providing innovative, unique and outstanding perspectives for the fulfilment of the requirements which satisfies our clients.">
 
@@ -40,7 +50,7 @@
         <link type="text/css" rel="stylesheet" href="{{asset('assets')}}/css/jquery.fancybox.min.css">
         <!-- In <head> -->
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
-
+        <link rel="canonical" href="{{ url()->current() }}">
 
         @yield('style')
         <!-- Favicon -->
