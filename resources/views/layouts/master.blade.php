@@ -59,6 +59,7 @@
         <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('assets/images/favicon.png') }}">
         <link rel="shortcut icon" href="{{ asset('assets/images/favicon.ico') }}">
         <link rel="icon" type="image/x-icon" href="{{ asset('assets/images/favicon.ico') }}">
+        <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 
         <!-- Global site tag (gtag.js) - Google Analytics -->
         <script async src="https://www.googletagmanager.com/gtag/js?id=G-5SJERTKGPV"></script>

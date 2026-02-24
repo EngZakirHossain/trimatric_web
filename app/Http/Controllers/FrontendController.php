@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Traits\ConsumesBackendApi;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Validator;
 
 class FrontendController extends Controller
 {
@@ -96,6 +98,32 @@ class FrontendController extends Controller
 
     public function sendContactMessage(Request $request)
     {
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|string|max:255',
+            'email' => 'required|email',
+            'phone' => ['nullable','regex:/^(?:\\+?88|0088)?01[3-9]\\d{8}$/'],
+            'message' => 'required|string',
+            'subject' => 'required|string',
+            'g-recaptcha-response' => 'required'
+        ]);
+
+        if ($validator->fails()) {
+            return redirect()->route('contact')->with('error', 'Validation failed. Please check your input and try again.')->withErrors($validator)->withInput();
+        }
+
+        $recaptcha = Http::asForm()->post(
+            'https://www.google.com/recaptcha/api/siteverify',
+            [
+                'secret' => config('services.recaptcha.secret_key'),
+                'response' => $request->input('g-recaptcha-response'),
+                'remoteip' => $request->ip(),
+            ]
+        );
+
+        if (! $recaptcha->json('success')) {
+            return redirect()->route('contact')->with('error', 'reCAPTCHA verification failed. Please try again.')->withInput();
+        }
+
         if ($request->filled('website')) {
             return redirect()->route('contact')->with('error', 'Spam detected. Message not sent.');
         }

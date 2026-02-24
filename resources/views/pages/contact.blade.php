@@ -1,5 +1,15 @@
 @extends('layouts.master')
 @section('title', 'Contact Us')
+@section('style')
+<style>
+    button:disabled {
+        background-color: #ccc; /* gray color */
+        color: #666;            /* text color */
+        cursor: not-allowed;    /* show disabled cursor */
+        opacity: 0.6;           /* optional: make it slightly faded */
+    }
+</style>
+@endsection
 @section('content')
     <!-- Content-->
     <div class="content">
@@ -112,9 +122,14 @@
                                                 </select>
                                             </div>
                                         </div>
-                                        <textarea name="message"  id="message" cols="40" rows="3" placeholder="Your Message:"></textarea>
+                                        <textarea style="margin-bottom: 10px"  name="message"  id="message" cols="40" rows="3" placeholder="Your Message:"></textarea>
+
                                         <div class="clearfix"></div>
-                                        <button class="btn float-btn flat-btn color-btn" type="submit" id="submit">Send Message</button>
+                                        <div class="g-recaptcha mb-20"
+                                            data-sitekey="{{ config('services.recaptcha.site_key') }}"
+                                            data-callback="recaptchaCompleted">
+                                        </div>
+                                        <button class="btn float-btn flat-btn color-btn " type="submit" id="submit" disabled>Send Message</button>
                                         <div id="loader"></div>
                                     </fieldset>
                                 </form>
@@ -134,4 +149,17 @@
         <!-- section end-->
     </div>
     <!-- Content end -->
+@endsection
+@section('script')
+<script>
+  // This function is called by reCAPTCHA when user completes it
+  function recaptchaCompleted() {
+    document.getElementById('submit').disabled = false;
+  }
+
+  // Optional: if you want to disable again on expiration
+  function recaptchaExpired() {
+    document.getElementById('submit').disabled = true;
+  }
+</script>
 @endsection
