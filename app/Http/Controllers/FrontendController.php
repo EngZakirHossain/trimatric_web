@@ -166,10 +166,21 @@ class FrontendController extends Controller
 
     private function fetchData(string $endpoint, int $ttl = 86400): array
     {
-        return Cache::remember("api_{$endpoint}", $ttl, function () use ($endpoint) {
-            $response = $this->apiGet($endpoint);
+        $cacheKey = "api_{$endpoint}";
+        $hashKey  = "api_{$endpoint}_hash";
 
-            return $response['data'] ?? [];
-        });
+        $response = $this->apiGet($endpoint);
+        $data = $response['data'] ?? [];
+
+        $newHash = md5(json_encode($data));
+
+        $oldHash = Cache::get($hashKey);
+
+        if ($newHash !== $oldHash) {
+            Cache::put($cacheKey, $data, $ttl);
+            Cache::put($hashKey, $newHash, $ttl);
+        }
+
+        return Cache::get($cacheKey, []);
     }
 }

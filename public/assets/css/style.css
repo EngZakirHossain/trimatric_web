@@ -1785,7 +1785,7 @@ section.parallax-section .bg {
 }
 section.parallax-section.parallax-sec-half-right,
 section.parallax-section.parallax-sec-half-left {
-	padding: 120px 0 170px;
+	padding: 120px 0 20px;
 }
 section.parallax-section.parallax-sec-half-right:before,
 section.parallax-section.parallax-sec-half-left:before {
