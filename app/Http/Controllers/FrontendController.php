@@ -15,34 +15,28 @@ class FrontendController extends Controller
 
     public function index()
     {
-        $sliders = $this->fetchData('sliders');
-        $projects = $this->fetchData('projects');
-        $clients = $this->fetchData('clients');
-        $services = $this->fetchData('services');
+        $sliders = $this->getCachedData('sliders');
+        $projects = $this->getCachedData('projects');
+        $clients = $this->getCachedData('clients');
+        $services = $this->getCachedData('services');
 
-        return view('pages.home', compact(
-            'sliders',
-            'projects',
-            'clients',
-            'services'
-        ));
+        $projects = collect($projects)->map(fn ($p) => [
+            ...$p,
+            'slug_category' => Str::slug($p['category_name'] ?? ''),
+        ]);
+
+        return view('pages.home', compact('sliders', 'projects', 'clients', 'services'));
     }
 
     public function projects()
     {
-        $projects = $this->fetchData('projects');
+        $projects = collect($this->getCachedData('projects'))
+            ->map(fn ($p) => [
+                ...$p,
+                'slug_category' => Str::slug($p['category_name'] ?? ''),
+            ]);
 
-        $projects = collect($projects)->map(function ($project) {
-            $project['slug_category'] = Str::slug($project['category_name']); // converts "Government Project" => "government-project"
-
-            return $project;
-        });
-
-        $categories = collect($projects)
-            ->pluck('slug_category')
-            ->filter()
-            ->unique()
-            ->values();
+        $categories = $projects->pluck('slug_category')->unique()->values();
 
         return view('pages.projects', compact('projects', 'categories'));
     }
@@ -64,42 +58,35 @@ class FrontendController extends Controller
 
     public function portfolio()
     {
-        $portfolios = $this->fetchData('projects/images/all');
 
-        $portfolios = collect($portfolios)->map(function ($portfolio) {
-            $portfolio['slug_category'] = Str::slug($portfolio['category_name']);
+        $portfolios = collect($this->getCachedData('projects/images/all'))
+            ->map(fn ($p) => [
+                ...$p,
+                'slug_category' => Str::slug($p['category_name'] ?? ''),
+            ]);
 
-            return $portfolio;
-        });
-
-        $categories = collect($portfolios)
-            ->pluck('slug_category')
-            ->filter()
-            ->unique()
-            ->values();
+        $categories = $portfolios->pluck('slug_category')->unique()->values();
 
         return view('pages.portfolio', compact('portfolios', 'categories'));
     }
 
     public function clients()
     {
-        $clients = $this->fetchData('clients');
+        $clients = $this->getCachedData('clients');
 
         return view('pages.clients', compact('clients'));
     }
 
     public function team()
     {
-        $teams = $this->fetchData('teams');
+        $teams = $this->getCachedData('teams');
 
-        $ceo = collect($teams)->first(function ($member) {
-            return str_contains(strtolower($member['designation'] ?? ''), 'ceo')
-                || str_contains(strtolower($member['name'] ?? ''), 'mosharraf');
-        });
+        $ceo = collect($teams)->first(fn($m) =>
+            str_contains(strtolower($m['designation'] ?? ''), 'ceo') ||
+            str_contains(strtolower($m['name'] ?? ''), 'mosharraf')
+        );
 
-        $others = collect($teams)->reject(function ($member) use ($ceo) {
-            return $ceo && $member['id'] == $ceo['id'];
-        });
+        $others = collect($teams)->reject(fn($m) => $ceo && $m['id'] == $ceo['id']);
 
         return view('pages.teams', compact('teams', 'ceo', 'others'));
     }
@@ -151,14 +138,14 @@ class FrontendController extends Controller
 
     public function circulars()
     {
-        $jobs = $this->fetchData('jobs');
+        $jobs = $this->getCachedData('jobs');
 
         return view('pages.circulars', compact('jobs'));
     }
 
     public function circularDetails($slug)
     {
-        $jobDetails = $this->fetchData("jobs/{$slug}");
+        $jobDetails = $this->getCachedData("jobs/{$slug}");
 
         return view('pages.circularDetails', compact('jobDetails'));
     }
@@ -177,7 +164,12 @@ class FrontendController extends Controller
         return redirect()->route('circular.details', ['slug' => $slug])->with('error', 'Failed to submit your application. Please try again later.');
     }
 
-    private function fetchData(string $endpoint, int $ttl = 86400): array
+    private function getCachedData(string $endpoint, int $ttl = 86400): array
+    {
+        return Cache::remember("api_{$endpoint}", $ttl, fn () => $this->fetchDataFromApi($endpoint));
+    }
+
+    private function fetchDataFromApi(string $endpoint, int $ttl = 86400): array
     {
         $cacheKey = "api_{$endpoint}";
         $hashKey = "api_{$endpoint}_hash";
