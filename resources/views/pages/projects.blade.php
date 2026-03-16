@@ -22,7 +22,7 @@
         <div class="gallery-items min-pad four-column vis-box-det">
             <!-- gallery-item-->
             @foreach($projects as $project)
-            <div class="gallery-item {{$project['category_name']}}">
+            <div class="gallery-item {{ Str::slug($project['slug_category']) }}">
                 <div class="grid-item-holder">
                 <a href="{{route('project.details',[$project['slug']])}}">
                     <a href="{{route('project.details',[$project['slug']])}}"/>
@@ -31,7 +31,7 @@
                         <div class=" fl-wrap full-height">
                             <div class="hd-box-wrap">
                                 <h2><a href="{{route('project.details',[$project['slug']])}}">{{$project['title']}}</a></h2>
-                                <p><a href="#">{{$project['category_name']}}</a></p>
+                                <p><a href="#">{{$project['slug_category']}}</a></p>
                             </div>
                         </div>
                     </div>

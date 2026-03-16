@@ -39,7 +39,7 @@
                 <!-- portfolio start -->
                 <div class="gallery-items spad  hde three-column">
                 @foreach( $portfolios as $portfolio)
-                    <div class="gallery-item {{$portfolio['category_name']}}">
+                    <div class="gallery-item {{$portfolio['slug_category']}}">
                         <div class="grid-item-holder ">
                             <a href="{{$portfolio['url']}}" data-fancybox="gallery">
                                 <img  src="{{$portfolio['url']}}" alt="{{$portfolio['project_name']}}">

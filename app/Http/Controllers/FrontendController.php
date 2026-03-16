@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 
 class FrontendController extends Controller
 {
@@ -31,8 +32,14 @@ class FrontendController extends Controller
     {
         $projects = $this->fetchData('projects');
 
+        $projects = collect($projects)->map(function ($project) {
+            $project['slug_category'] = Str::slug($project['category_name']); // converts "Government Project" => "government-project"
+
+            return $project;
+        });
+
         $categories = collect($projects)
-            ->pluck('category_name')
+            ->pluck('slug_category')
             ->filter()
             ->unique()
             ->values();
@@ -59,8 +66,14 @@ class FrontendController extends Controller
     {
         $portfolios = $this->fetchData('projects/images/all');
 
+        $portfolios = collect($portfolios)->map(function ($portfolio) {
+            $portfolio['slug_category'] = Str::slug($portfolio['category_name']);
+
+            return $portfolio;
+        });
+
         $categories = collect($portfolios)
-            ->pluck('category_name')
+            ->pluck('slug_category')
             ->filter()
             ->unique()
             ->values();
@@ -101,10 +114,10 @@ class FrontendController extends Controller
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
             'email' => 'required|email',
-            'phone' => ['nullable','regex:/^(?:\\+?88|0088)?01[3-9]\\d{8}$/'],
+            'phone' => ['nullable', 'regex:/^(?:\\+?88|0088)?01[3-9]\\d{8}$/'],
             'message' => 'required|string',
             'subject' => 'required|string',
-            'g-recaptcha-response' => 'required'
+            'g-recaptcha-response' => 'required',
         ]);
 
         if ($validator->fails()) {
@@ -167,7 +180,7 @@ class FrontendController extends Controller
     private function fetchData(string $endpoint, int $ttl = 86400): array
     {
         $cacheKey = "api_{$endpoint}";
-        $hashKey  = "api_{$endpoint}_hash";
+        $hashKey = "api_{$endpoint}_hash";
 
         $response = $this->apiGet($endpoint);
         $data = $response['data'] ?? [];
