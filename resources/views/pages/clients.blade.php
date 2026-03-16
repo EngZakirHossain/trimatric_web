@@ -4,7 +4,7 @@
     <!-- Content-->
         @include('layouts.partials.breadcrumb')
         <!-- section-->
-        <section class="parallax-section dark-bg sec-half parallax-sec-half-right" data-scrollax-parent="true">
+        <section class="parallax-section dark-bg sec-half parallax-sec-half-right" data-scrollax-parent="true" style="padding: 120px 0 10px !important">
             <div class="bg par-elem" data-bg="{{asset('assets/images/clients.jpg')}}" data-scrollax="properties: { translateY: '30%' }"></div>
             <div class="overlay"></div>
             <div class="pattern-bg"></div>
