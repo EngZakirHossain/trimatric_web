@@ -81,12 +81,11 @@ class FrontendController extends Controller
     {
         $teams = $this->getCachedData('teams');
 
-        $ceo = collect($teams)->first(fn($m) =>
-            str_contains(strtolower($m['designation'] ?? ''), 'ceo') ||
+        $ceo = collect($teams)->first(fn ($m) => str_contains(strtolower($m['designation'] ?? ''), 'ceo') ||
             str_contains(strtolower($m['name'] ?? ''), 'mosharraf')
         );
 
-        $others = collect($teams)->reject(fn($m) => $ceo && $m['id'] == $ceo['id']);
+        $others = collect($teams)->reject(fn ($m) => $ceo && $m['id'] == $ceo['id']);
 
         return view('pages.teams', compact('teams', 'ceo', 'others'));
     }
@@ -166,6 +165,27 @@ class FrontendController extends Controller
 
     private function getCachedData(string $endpoint, int $ttl = 3600): array
     {
-        return Cache::remember("api_{$endpoint}", $ttl, fn () => $this->apiGet($endpoint)['data'] ?? []);
+        $cacheKey = "api_{$endpoint}";
+        $hashKey = "api_hash_{$endpoint}";
+
+        // Always fetch lightweight API response
+        $response = $this->apiGet($endpoint);
+        $data = $response['data'] ?? [];
+
+        // Create hash from response
+        $newHash = md5(json_encode($data));
+
+        $oldHash = Cache::get($hashKey);
+
+        // If data changed → update cache immediately
+        if ($newHash !== $oldHash) {
+            Cache::put($cacheKey, $data, $ttl);
+            Cache::put($hashKey, $newHash, $ttl);
+
+            return $data;
+        }
+
+        // Otherwise return cached version
+        return Cache::remember($cacheKey, $ttl, fn () => $data);
     }
 }
