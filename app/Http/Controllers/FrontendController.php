@@ -164,66 +164,96 @@ class FrontendController extends Controller
     {
         $cacheKey = "api_{$endpoint}";
 
-        $cachedData = Cache::get($cacheKey, []);
+        if (Cache::has($cacheKey)) {
+            $cachedData = Cache::get($cacheKey);
 
-        $lockKey = "lock_api_refresh_{$endpoint}";
-        $needsRefresh = ! Cache::has("fresh_{$cacheKey}");
+            $lockKey = "lock_api_refresh_{$endpoint}";
+            $needsRefresh = ! Cache::has("fresh_{$cacheKey}");
 
-        if ($needsRefresh) {
-            Cache::lock($lockKey, 10)->block(0, function () use ($cacheKey, $endpoint, $ttl) {
-                $response = $this->apiGet($endpoint);
-                $data = $response['data'] ?? [];
+            if ($needsRefresh) {
+                Cache::lock($lockKey, 10)->block(0, function () use ($cacheKey, $endpoint, $ttl) {
+                    $response = $this->apiGet($endpoint);
+                    $data = $response['data'] ?? [];
+                    Cache::put($cacheKey, $data, $ttl);
+                    Cache::put("fresh_{$cacheKey}", true, $ttl);
+                });
+            }
 
-                Cache::put($cacheKey, $data, $ttl);
-                Cache::put("fresh_{$cacheKey}", true, $ttl);
-            });
+            return $cachedData;
         }
 
-        return $cachedData;
+        $response = $this->apiGet($endpoint);
+        $data = $response['data'] ?? [];
+
+        Cache::put($cacheKey, $data, $ttl);
+        Cache::put("fresh_{$cacheKey}", true, $ttl);
+
+        return $data;
     }
 
     private function getHomepageBundle(int $ttl = 86400): array
     {
         $cacheKey = 'homepage_bundle';
 
-        $cachedBundle = Cache::get($cacheKey, [
-            'sliders' => [],
-            'projects' => [],
-            'clients' => [],
-            'services' => [],
-            'portfolio_images' => [],
-        ]);
+        if (Cache::has($cacheKey)) {
+            $cachedBundle = Cache::get($cacheKey);
 
-        $lockKey = "lock_{$cacheKey}";
-        $needsRefresh = ! Cache::has("fresh_{$cacheKey}");
+            $lockKey = "lock_{$cacheKey}";
+            $needsRefresh = ! Cache::has("fresh_{$cacheKey}");
 
-        if ($needsRefresh) {
-            Cache::lock($lockKey, 15)->block(0, function () use ($cacheKey, $ttl) {
-                $sliders = app()->make(self::class)->apiGet('sliders')['data'] ?? [];
-                $projects = app()->make(self::class)->apiGet('projects')['data'] ?? [];
-                $clients = app()->make(self::class)->apiGet('clients')['data'] ?? [];
-                $services = app()->make(self::class)->apiGet('services')['data'] ?? [];
-                $portfolioImages = app()->make(self::class)->apiGet('projects/images/all')['data'] ?? [];
+            if ($needsRefresh) {
+                Cache::lock($lockKey, 15)->block(0, function () use ($cacheKey, $ttl) {
+                    $sliders = $this->apiGet('sliders')['data'] ?? [];
+                    $projects = $this->apiGet('projects')['data'] ?? [];
+                    $clients = $this->apiGet('clients')['data'] ?? [];
+                    $services = $this->apiGet('services')['data'] ?? [];
+                    $portfolioImages = $this->apiGet('projects/images/all')['data'] ?? [];
 
-                $projectsFormatted = collect($projects)
-                    ->map(fn ($p) => [...$p, 'slug_category' => Str::slug($p['category_name'] ?? '')]);
+                    $projectsFormatted = collect($projects)
+                        ->map(fn ($p) => [...$p, 'slug_category' => Str::slug($p['category_name'] ?? '')]);
 
-                $portfolioFormatted = collect($portfolioImages)
-                    ->map(fn ($p) => [...$p, 'slug_category' => Str::slug($p['category_name'] ?? '')]);
+                    $portfolioFormatted = collect($portfolioImages)
+                        ->map(fn ($p) => [...$p, 'slug_category' => Str::slug($p['category_name'] ?? '')]);
 
-                $bundle = [
-                    'sliders' => $sliders,
-                    'projects' => $projectsFormatted->toArray(),
-                    'clients' => $clients,
-                    'services' => $services,
-                    'portfolio_images' => $portfolioFormatted->toArray(),
-                ];
+                    $bundle = [
+                        'sliders' => $sliders,
+                        'projects' => $projectsFormatted->toArray(),
+                        'clients' => $clients,
+                        'services' => $services,
+                        'portfolio_images' => $portfolioFormatted->toArray(),
+                    ];
 
-                Cache::put($cacheKey, $bundle, $ttl);
-                Cache::put("fresh_{$cacheKey}", true, $ttl);
-            });
+                    Cache::put($cacheKey, $bundle, $ttl);
+                    Cache::put("fresh_{$cacheKey}", true, $ttl);
+                });
+            }
+
+            return $cachedBundle;
         }
 
-        return $cachedBundle;
+        $sliders = $this->apiGet('sliders')['data'] ?? [];
+        $projects = $this->apiGet('projects')['data'] ?? [];
+        $clients = $this->apiGet('clients')['data'] ?? [];
+        $services = $this->apiGet('services')['data'] ?? [];
+        $portfolioImages = $this->apiGet('projects/images/all')['data'] ?? [];
+
+        $projectsFormatted = collect($projects)
+            ->map(fn ($p) => [...$p, 'slug_category' => Str::slug($p['category_name'] ?? '')]);
+
+        $portfolioFormatted = collect($portfolioImages)
+            ->map(fn ($p) => [...$p, 'slug_category' => Str::slug($p['category_name'] ?? '')]);
+
+        $bundle = [
+            'sliders' => $sliders,
+            'projects' => $projectsFormatted->toArray(),
+            'clients' => $clients,
+            'services' => $services,
+            'portfolio_images' => $portfolioFormatted->toArray(),
+        ];
+
+        Cache::put($cacheKey, $bundle, $ttl);
+        Cache::put("fresh_{$cacheKey}", true, $ttl);
+
+        return $bundle;
     }
 }
