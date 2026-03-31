@@ -160,14 +160,12 @@ class FrontendController extends Controller
             ->with('error', 'Failed to submit your application. Please try again later.');
     }
 
-    private function getCachedData(string $endpoint, int $ttl = 3600): array
+    private function getCachedData(string $endpoint, int $ttl = 86400): array
     {
         $cacheKey = "api_{$endpoint}";
 
-        // 1️⃣ Get cached data immediately (fast)
         $cachedData = Cache::get($cacheKey, []);
 
-        // 2️⃣ Lazy refresh if stale
         $lockKey = "lock_api_refresh_{$endpoint}";
         $needsRefresh = ! Cache::has("fresh_{$cacheKey}");
 
@@ -176,17 +174,15 @@ class FrontendController extends Controller
                 $response = $this->apiGet($endpoint);
                 $data = $response['data'] ?? [];
 
-                // Update cache and mark fresh
                 Cache::put($cacheKey, $data, $ttl);
                 Cache::put("fresh_{$cacheKey}", true, $ttl);
             });
         }
 
-        // 3️⃣ Always return cached data instantly
         return $cachedData;
     }
 
-    private function getHomepageBundle(int $ttl = 3600): array
+    private function getHomepageBundle(int $ttl = 86400): array
     {
         $cacheKey = 'homepage_bundle';
 
