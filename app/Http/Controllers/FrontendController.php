@@ -15,14 +15,14 @@ class FrontendController extends Controller
 
     public function index()
     {
-        $sliders = $this->getCachedData('sliders');
-        $projects = $this->getCachedData('projects');
-        $clients = $this->getCachedData('clients');
-        $services = $this->getCachedData('services');
+        $bundle = $this->getHomepageBundle();
 
-        $projects = $this->formatProjects($this->getCachedData('projects'));
-
-        return view('pages.home', compact('sliders', 'projects', 'clients', 'services'));
+        return view('pages.home', [
+            'sliders' => $bundle['sliders'],
+            'projects' => $bundle['projects'],
+            'clients' => $bundle['clients'],
+            'services' => $bundle['services'],
+        ]);
     }
 
     public function projects()
@@ -44,27 +44,17 @@ class FrontendController extends Controller
     public function projectDetails($slug)
     {
         $response = $this->apiGet("projects/{$slug}");
-
         $project = $response['data'] ?? [];
         $previous_project = $response['previous_project'] ?? null;
         $next_project = $response['next_project'] ?? null;
 
-        return view('pages.projectDetails', compact(
-            'project',
-            'previous_project',
-            'next_project'
-        ));
+        return view('pages.projectDetails', compact('project', 'previous_project', 'next_project'));
     }
 
     public function portfolio()
     {
-
-        $portfolios = collect($this->getCachedData('projects/images/all'))
-            ->map(fn ($p) => [
-                ...$p,
-                'slug_category' => Str::slug($p['category_name'] ?? ''),
-            ]);
-
+        $bundle = $this->getHomepageBundle();
+        $portfolios = collect($bundle['portfolio_images']);
         $categories = $portfolios->pluck('slug_category')->unique()->values();
 
         return view('pages.portfolio', compact('portfolios', 'categories'));
@@ -107,7 +97,10 @@ class FrontendController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return redirect()->route('contact')->with('error', 'Validation failed. Please check your input and try again.')->withErrors($validator)->withInput();
+            return redirect()->route('contact')
+                ->with('error', 'Validation failed. Please check your input.')
+                ->withErrors($validator)
+                ->withInput();
         }
 
         $recaptcha = Http::asForm()->post(
@@ -120,12 +113,13 @@ class FrontendController extends Controller
         );
 
         if (! $recaptcha->json('success')) {
-            return redirect()->route('contact')->with('error', 'reCAPTCHA verification failed. Please try again.')->withInput();
+            return redirect()->route('contact')->with('error', 'reCAPTCHA verification failed.');
         }
 
         if ($request->filled('website')) {
             return redirect()->route('contact')->with('error', 'Spam detected. Message not sent.');
         }
+
         $response = $this->apiPost('contact', $request->all());
 
         if (isset($response['status']) && $response['status'] == true) {
@@ -154,38 +148,86 @@ class FrontendController extends Controller
         if ($request->filled('website')) {
             return redirect()->route('circular.details', ['slug' => $slug]);
         }
+
         $response = $this->apiPost("jobs/{$slug}/apply", $request->all());
 
         if (isset($response['status']) && $response['status'] == true) {
-            return redirect()->route('circular.details', ['slug' => $slug])->with('message', 'Your application has been submitted successfully!');
+            return redirect()->route('circular.details', ['slug' => $slug])
+                ->with('message', 'Your application has been submitted successfully!');
         }
 
-        return redirect()->route('circular.details', ['slug' => $slug])->with('error', 'Failed to submit your application. Please try again later.');
+        return redirect()->route('circular.details', ['slug' => $slug])
+            ->with('error', 'Failed to submit your application. Please try again later.');
     }
 
     private function getCachedData(string $endpoint, int $ttl = 3600): array
     {
         $cacheKey = "api_{$endpoint}";
-        $hashKey = "api_hash_{$endpoint}";
 
-        // Always fetch lightweight API response
-        $response = $this->apiGet($endpoint);
-        $data = $response['data'] ?? [];
+        // 1️⃣ Get cached data immediately (fast)
+        $cachedData = Cache::get($cacheKey, []);
 
-        // Create hash from response
-        $newHash = md5(json_encode($data));
+        // 2️⃣ Lazy refresh if stale
+        $lockKey = "lock_api_refresh_{$endpoint}";
+        $needsRefresh = ! Cache::has("fresh_{$cacheKey}");
 
-        $oldHash = Cache::get($hashKey);
+        if ($needsRefresh) {
+            Cache::lock($lockKey, 10)->block(0, function () use ($cacheKey, $endpoint, $ttl) {
+                $response = $this->apiGet($endpoint);
+                $data = $response['data'] ?? [];
 
-        // If data changed → update cache immediately
-        if ($newHash !== $oldHash) {
-            Cache::put($cacheKey, $data, $ttl);
-            Cache::put($hashKey, $newHash, $ttl);
-
-            return $data;
+                // Update cache and mark fresh
+                Cache::put($cacheKey, $data, $ttl);
+                Cache::put("fresh_{$cacheKey}", true, $ttl);
+            });
         }
 
-        // Otherwise return cached version
-        return Cache::remember($cacheKey, $ttl, fn () => $data);
+        // 3️⃣ Always return cached data instantly
+        return $cachedData;
+    }
+
+    private function getHomepageBundle(int $ttl = 3600): array
+    {
+        $cacheKey = 'homepage_bundle';
+
+        $cachedBundle = Cache::get($cacheKey, [
+            'sliders' => [],
+            'projects' => [],
+            'clients' => [],
+            'services' => [],
+            'portfolio_images' => [],
+        ]);
+
+        $lockKey = "lock_{$cacheKey}";
+        $needsRefresh = ! Cache::has("fresh_{$cacheKey}");
+
+        if ($needsRefresh) {
+            Cache::lock($lockKey, 15)->block(0, function () use ($cacheKey, $ttl) {
+                $sliders = app()->make(self::class)->apiGet('sliders')['data'] ?? [];
+                $projects = app()->make(self::class)->apiGet('projects')['data'] ?? [];
+                $clients = app()->make(self::class)->apiGet('clients')['data'] ?? [];
+                $services = app()->make(self::class)->apiGet('services')['data'] ?? [];
+                $portfolioImages = app()->make(self::class)->apiGet('projects/images/all')['data'] ?? [];
+
+                $projectsFormatted = collect($projects)
+                    ->map(fn ($p) => [...$p, 'slug_category' => Str::slug($p['category_name'] ?? '')]);
+
+                $portfolioFormatted = collect($portfolioImages)
+                    ->map(fn ($p) => [...$p, 'slug_category' => Str::slug($p['category_name'] ?? '')]);
+
+                $bundle = [
+                    'sliders' => $sliders,
+                    'projects' => $projectsFormatted->toArray(),
+                    'clients' => $clients,
+                    'services' => $services,
+                    'portfolio_images' => $portfolioFormatted->toArray(),
+                ];
+
+                Cache::put($cacheKey, $bundle, $ttl);
+                Cache::put("fresh_{$cacheKey}", true, $ttl);
+            });
+        }
+
+        return $cachedBundle;
     }
 }
