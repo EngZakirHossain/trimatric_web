@@ -20,25 +20,25 @@ class FrontendController extends Controller
         $clients = $this->getCachedData('clients');
         $services = $this->getCachedData('services');
 
-        $projects = collect($projects)->map(fn ($p) => [
-            ...$p,
-            'slug_category' => Str::slug($p['category_name'] ?? ''),
-        ]);
+        $projects = $this->formatProjects($this->getCachedData('projects'));
 
         return view('pages.home', compact('sliders', 'projects', 'clients', 'services'));
     }
 
     public function projects()
     {
-        $projects = collect($this->getCachedData('projects'))
-            ->map(fn ($p) => [
-                ...$p,
-                'slug_category' => Str::slug($p['category_name'] ?? ''),
-            ]);
-
+        $projects = $this->formatProjects($this->getCachedData('projects'));
         $categories = $projects->pluck('slug_category')->unique()->values();
 
         return view('pages.projects', compact('projects', 'categories'));
+    }
+
+    private function formatProjects(array $projects): \Illuminate\Support\Collection
+    {
+        return collect($projects)->map(fn ($p) => [
+            ...$p,
+            'slug_category' => Str::slug($p['category_name'] ?? ''),
+        ]);
     }
 
     public function projectDetails($slug)
@@ -164,28 +164,8 @@ class FrontendController extends Controller
         return redirect()->route('circular.details', ['slug' => $slug])->with('error', 'Failed to submit your application. Please try again later.');
     }
 
-    private function getCachedData(string $endpoint, int $ttl = 86400): array
+    private function getCachedData(string $endpoint, int $ttl = 3600): array
     {
-        return Cache::remember("api_{$endpoint}", $ttl, fn () => $this->fetchDataFromApi($endpoint));
-    }
-
-    private function fetchDataFromApi(string $endpoint, int $ttl = 86400): array
-    {
-        $cacheKey = "api_{$endpoint}";
-        $hashKey = "api_{$endpoint}_hash";
-
-        $response = $this->apiGet($endpoint);
-        $data = $response['data'] ?? [];
-
-        $newHash = md5(json_encode($data));
-
-        $oldHash = Cache::get($hashKey);
-
-        if ($newHash !== $oldHash) {
-            Cache::put($cacheKey, $data, $ttl);
-            Cache::put($hashKey, $newHash, $ttl);
-        }
-
-        return Cache::get($cacheKey, []);
+        return Cache::remember("api_{$endpoint}", $ttl, fn () => $this->apiGet($endpoint)['data'] ?? []);
     }
 }
