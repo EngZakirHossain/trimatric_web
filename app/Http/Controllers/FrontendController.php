@@ -16,12 +16,14 @@ class FrontendController extends Controller
     public function index()
     {
         $bundle = $this->getHomepageBundle();
+        $seo = $this->prepareHomepageSeo($bundle['services']);
 
         return view('pages.home', [
             'sliders' => $bundle['sliders'],
             'projects' => $bundle['projects'],
             'clients' => $bundle['clients'],
             'services' => $bundle['services'],
+            'seo' => $seo,
         ]);
     }
 
@@ -45,10 +47,11 @@ class FrontendController extends Controller
     {
         $response = $this->apiGet("projects/{$slug}");
         $project = $response['data'] ?? [];
+        $seo = $this->prepareSeo($project);
         $previous_project = $response['previous_project'] ?? null;
         $next_project = $response['next_project'] ?? null;
 
-        return view('pages.projectDetails', compact('project', 'previous_project', 'next_project'));
+        return view('pages.projectDetails', compact('project', 'previous_project', 'next_project', 'seo'));
     }
 
     public function portfolio()
@@ -255,5 +258,44 @@ class FrontendController extends Controller
         Cache::put("fresh_{$cacheKey}", true, $ttl);
 
         return $bundle;
+    }
+
+    private function prepareSeo(array $data): array
+    {
+        return [
+            'title' => $data['page_title'] ?? $data['title'] ?? 'Trimatric Architects & Engineers',
+            'description' => $data['description'] ?? '',
+            'keywords' => isset($data['keywords']) ? implode(',', $data['keywords']) : '',
+        ];
+    }
+
+    private function prepareHomepageSeo(array $services): array
+    {
+
+        if (empty($services)) {
+            return [
+                'title' => 'Trimatric Architects & Engineers',
+                'description' => 'One of the pioneer concerns in the field of Interior Design & Turnkey based execution service provider for Residential, Commercial, Hospitality, Retail & Corporate Clients. With the proven capability of excellent imaginative ability and committed professionalism, we bring out the hidden persona of our clients’ and reflect it through Designs tailored accordingly. Apart from business opportunities, we are always keenly devoted to providing innovative, unique and outstanding perspectives for the fulfilment of the requirements which satisfies our clients.',
+                'keywords' => 'Trimatric, Architecture, Interior Design, Residential, Commercial, Hospitality, Retail, Corporate',
+            ];
+        }
+
+        $titles = array_column($services, 'title');
+        $descriptions = array_column($services, 'page_title');
+        $keywords = [];
+
+        foreach ($services as $s) {
+            if (! empty($s['keywords'])) {
+                $keywords = array_merge($keywords, $s['keywords']);
+            }
+        }
+
+        $keywords = array_unique($keywords);
+
+        return [
+            'title' => 'Our Services: '.implode(', ', $titles),
+            'description' => 'Explore our services: '.implode(', ', $descriptions),
+            'keywords' => implode(',', $keywords) ?: 'Design, Architecture',
+        ];
     }
 }

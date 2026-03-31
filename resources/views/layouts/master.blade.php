@@ -39,9 +39,11 @@
             Trimatric Architects & Engineers | Architecture & Engineering Firm in Bangladesh
         @endif
         </title>
-        <meta name="title" content="Trimatric Architects & Engineers">
-        <meta name="description" content="One of the pioneer concerns in the field of Interior Design & Turnkey based execution service provider for Residential, Commercial, Hospitality, Retail & Corporate Clients. With the proven capability of excellent imaginative ability and committed professionalism, we bring out the hidden persona of our clients’ and reflect it through Designs tailored accordingly. Apart from business opportunities, we are always keenly devoted to providing innovative, unique and outstanding perspectives for the fulfilment of the requirements which satisfies our clients.">
-
+        @if(isset($seo) && is_array($seo))
+            <meta name="title" content="{{ $seo['title'] }}">
+            <meta name="description" content="{{ $seo['description'] }}">
+            <meta name="keywords" content="{{ $seo['keywords'] }}">
+        @endif
         <!--=============== css  ===============-->
         <link type="text/css" rel="stylesheet" href="{{asset('assets')}}/css/reset.css">
         <link type="text/css" rel="stylesheet" href="{{asset('assets')}}/css/plugins.css">
