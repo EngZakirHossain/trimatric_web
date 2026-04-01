@@ -10,7 +10,7 @@
             <li><a class="scroll-link" href="#sec2">About</a></li>
             <li><a class="scroll-link" href="#sec3">Services</a></li>
             <li><a class="scroll-link" href="#sec4">Projects</a></li>
-            <li><a class="scroll-link" href="#sec5">Clients</a></li>
+            <li><a href="{{route('clients.list')}}" class="external" target="">Clients</a></li>
             <li><a href="{{route('portfolio')}}" class="external" target="">Portfolio</a></li>
             <li><a href="{{route('team.list')}}" class="external" target="">Team</a></li>
         </ul>

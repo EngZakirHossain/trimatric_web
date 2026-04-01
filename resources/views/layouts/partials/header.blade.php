@@ -13,10 +13,15 @@
     <!-- nav-button-wrap end-->
     <div class="header-social">
         <ul >
-            <li><a href="{{ $siteSetting['fb_link'] ?? '' }}" target="_blank"><i class="fab fa-facebook-f"></i></a></li>
-            <li><a href="{{ $siteSetting['youtube_link'] ?? '' }}" target="_blank"><i class="fab fa-youtube"></i></a></li>
-            <li><a href="{{ $siteSetting['x_link'] ?? '' }}" target="_blank"><i class="fab fa-twitter"></i></a></li>
-            <li><a href="{{ $siteSetting['linkedin_link'] ?? '' }}" target="_blank"><i class="fab fa-linkedin-in"></i></a></li>
+            @foreach(getSocialLinks() as $key => $icon)
+                @if(!empty($siteSetting[$key]))
+                    <li>
+                        <a href="{{ $siteSetting[$key] }}" target="_blank" rel="noopener noreferrer">
+                            <i class="fab {{ $icon }}"></i>
+                        </a>
+                    </li>
+                @endif
+            @endforeach
         </ul>
     </div>
     <!--  showshare -->

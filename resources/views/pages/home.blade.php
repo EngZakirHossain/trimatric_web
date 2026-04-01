@@ -241,13 +241,13 @@
 
         <div class="section-subtitle" data-scrollax="properties: { translateY: '-250px' }">Our
             Clients<span>//</span></div>
-        <div class="container">
+        {{-- <div class="container">
             <div class="section-title fl-wrap">
-                <h2>Our <span>Clients</span></h2>
-                <a href="{{route('clients.list')}}" class="btn float-btn flat-btn color-btn">Client List</a>
+                <h2 style="font-size:24px !important">Our <span>Clients</span></h2>
+                <a href="{{route('clients.list')}}" class="btn float-btn flat-btn color-btn" style="font-size:8px !important">Client List</a>
             </div>
         </div>
-        <div class="clearfix"></div>
+        <div class="clearfix"></div> --}}
 
         <!-- client-list -->
         <div class="fl-wrap">
@@ -256,7 +256,7 @@
                     @foreach($clients as $client)
                         <li>
                             <a href="javascript:void(0);">
-                                <img width="50%" height="50%" src="{{ $client['logo'] }}" alt="{{ $client['name'] }}">
+                                <img width="80%" height="80%" src="{{ $client['logo'] }}" alt="{{ $client['name'] }}">
                             </a>
                         </li>
                     @endforeach
