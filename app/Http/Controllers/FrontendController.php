@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Traits\ConsumesBackendApi;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Validator;
@@ -297,5 +298,25 @@ class FrontendController extends Controller
             'description' => 'Explore our services: '.implode(', ', $descriptions),
             'keywords' => implode(',', $keywords) ?: 'Design, Architecture',
         ];
+    }
+
+    public function clearCache(Request $request)
+    {
+        $providedToken = $request->header('X-Cache-Token');
+        $validToken = config('services.backend.token');
+
+        if (! $providedToken || $providedToken !== $validToken) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Unauthorized: Invalid token',
+            ], 401);
+        }
+
+        Artisan::call('optimize:clear');
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Cache cleared successfully',
+        ]);
     }
 }
