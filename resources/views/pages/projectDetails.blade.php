@@ -4,7 +4,14 @@
 @section('content')
     <!-- Content-->
         <div class="single-page-decor"></div>
-        @include('layouts.partials.breadcrumb')
+        <div class="single-page-fixed-row">
+            <div class="scroll-down-wrap">
+                <a href="{{route('home')}}">
+                    <img class="img-responsive" width="180px" height="50px" src="{{ $siteSetting['logo'] ?? '' }}" alt="">
+                </a>
+            </div>
+            <a href="{{route('projects.list')}}" class="single-page-fixed-row-link"><i class="fal fa-arrow-left"></i> <span>Back to projects</span></a>
+        </div>
         <!-- section  -->
         <section class="dark-bg sinsec-dec">
             <div class="single-project-title fl-wrap">
